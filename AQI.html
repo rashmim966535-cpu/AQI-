@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Air Quality Awareness Dashboard</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f1f7f3;
+    color: #203d30;
+    line-height: 1.6;
+}
+
+header {
+    background: #145c40;
+    color: white;
+    padding: 22px 15px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 28px;
+}
+
+header p {
+    color: #d7eee0;
+    margin-top: 5px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 22px;
+}
+
+.notice {
+    background: #fff3cd;
+    color: #785c12;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.controls {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+.controls label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+select {
+    padding: 10px;
+    border: 1px solid #bdcec2;
+    border-radius: 7px;
+    background: white;
+    min-width: 190px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #0000000b;
+    border-top: 4px solid #3c966a;
+}
+
+.card h3 {
+    font-size: 15px;
+    color: #66776c;
+}
+
+.card .value {
+    font-size: 30px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.card p {
+    font-size: 13px;
+    color: #69796f;
+}
+
+.status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.good {
+    background: #d9f4df;
+    color: #176b35;
+}
+
+.moderate {
+    background: #fff0b8;
+    color: #8b6800;
+}
+
+.sensitive {
+    background: #ffe0c2;
+    color: #9b4c0c;
+}
+
+.unhealthy {
+    background: #ffd6d6;
+    color: #a32121;
+}
+
+.very-unhealthy {
+    background: #e8d8ff;
+    color: #62339a;
+}
+
+.hazardous {
+    background: #f5d6e0;
+    color: #80213e;
+}
+
+.panel {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 22px;
+    box-shadow: 0 3px 12px #0000000b;
+}
+
+.panel h2 {
+    margin-bottom: 15px;
+    color: #145c40;
+}
+
+.chart-row {
+    display: grid;
+    grid-template-columns: 145px 1fr 40px;
+    gap: 10px;
+    align-items: center;
+    margin: 16px 0;
+    font-size: 13px;
+}
+
+.bar-bg {
+    background: #edf2ee;
+    height: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.4s;
+}
+
+.recommendation {
+    background: #e7f5eb;
+    border-left: 5px solid #268455;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.recommendation h3 {
+    margin-bottom: 8px;
+}
+
+.recommendation ul {
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+.recommendation li {
+    margin: 6px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+th, td {
+    text-align: left;
+    padding: 13px;
+    border-bottom: 1px solid #e3ebe5;
+    font-size: 13px;
+}
+
+th {
+    background: #e7f2e9;
+}
+
+tbody tr:hover {
+    background: #f2f8f3;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+footer {
+    text-align: center;
+    padding: 22px;
+    background: #145c40;
+    color: white;
+    font-size: 13px;
+}
+
+@media (max-width: 800px) {
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    header h1 {
+        font-size: 22px;
+    }
+
+    .container {
+        padding: 13px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+    }
+
+    .card {
+        padding: 13px;
+    }
+
+    .card .value {
+        font-size: 24px;
+    }
+
+    .chart-row {
+        grid-template-columns: 100px 1fr 30px;
+        gap: 6px;
+    }
+
+    select {
+        min-width: 150px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌿 Air Quality Awareness Dashboard</h1>
+    <p>Monitor air quality. Understand pollution. Protect your health.</p>
+</header>
+
+<main class="container">
+
+    <div class="notice">
+        <strong>Demo notice:</strong>
+        All AQI and pollutant readings below are illustrative sample
+        data, not live measurements for Mandya or any other city.
+    </div>
+
+    <div class="controls">
+        <div>
+            <label for="areaSelect">Select City Area</label>
+            <select id="areaSelect">
+                <option value="0">City Centre</option>
+                <option value="1">Green Park</option>
+                <option value="2">Industrial Zone</option>
+                <option value="3">Riverside</option>
+                <option value="4">Highway Junction</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="pollutantSelect">Select Pollutant</label>
+            <select id="pollutantSelect">
+                <option value="pm25">PM2.5</option>
+                <option value="pm10">PM10</option>
+                <option value="no2">NO₂</option>
+                <option value="o3">O₃</option>
+            </select>
+        </div>
+    </div>
+
+    <section class="cards">
+        <div class="card">
+            <h3>Air Quality Index</h3>
+            <div class="value" id="aqi">72</div>
+            <span id="status" class="status moderate">Moderate</span>
+            <p id="aqiDescription">Air quality is acceptable for most people.</p>
+        </div>
+
+        <div class="card">
+            <h3>PM2.5</h3>
+            <div class="value" id="pm25">22</div>
+            <p>Fine particles (µg/m³)</p>
+        </div>
+
+        <div class="card">
+            <h3>PM10</h3>
+            <div class="value" id="pm10">48</div>
+            <p>Coarse particles (µg/m³)</p>
+        </div>
+
+        <div class="card">
+            <h3>Selected Area</h3>
+            <div class="value" id="areaName"
+                 style="font-size:21px">City Centre</div>
+            <p id="areaNote">Busy roads and commercial activity.</p>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>📊 Pollution Comparison Chart</h2>
+        <p id="chartSubtitle">
+            Sample AQI comparison between city areas.
+        </p>
+        <div id="chart"></div>
+    </section>
+
+    <section class="panel">
+        <h2>💚 Health Recommendations</h2>
+        <div class="recommendation">
+            <h3 id="adviceTitle">A few precautions</h3>
+            <p id="adviceLead"></p>
+            <ul id="adviceList"></ul>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>📍 City Area Readings</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>City Area</th>
+                        <th>AQI</th>
+                        <th>Pollution Level</th>
+                        <th>Observation</th>
+                    </tr>
+                </thead>
+                <tbody id="areaTable"></tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <p>Air Quality Awareness Dashboard | Student Project</p>
+    <p>Created using HTML, CSS and JavaScript</p>
+    <p>For actual conditions, check official CPCB air-quality information.</p>
+</footer>
+
+<script>
+// SAMPLE DATA FOR DEMONSTRATION ONLY
+const areas = [
+    {
+        name: "City Centre",
+        aqi: 72,
+        pm25: 22,
+        pm10: 48,
+        no2: 31,
+        o3: 44,
+        note: "Busy roads and commercial activity."
+    },
+    {
+        name: "Green Park",
+        aqi: 34,
+        pm25: 9,
+        pm10: 21,
+        no2: 12,
+        o3: 28,
+        note: "More green space and less traffic."
+    },
+    {
+        name: "Industrial Zone",
+        aqi: 168,
+        pm25: 61,
+        pm10: 126,
+        no2: 68,
+        o3: 53,
+        note: "Industrial activity and heavy vehicles."
+    },
+    {
+        name: "Riverside",
+        aqi: 56,
+        pm25: 16,
+        pm10: 35,
+        no2: 19,
+        o3: 37,
+        note: "Residential and open spaces."
+    },
+    {
+        name: "Highway Junction",
+        aqi: 124,
+        pm25: 44,
+        pm10: 89,
+        no2: 57,
+        o3: 48,
+        note: "Traffic congestion and road dust."
+    }
+];
+
+// Determine AQI category and colour
+function getCategory(aqi) {
+    if (aqi <= 50) {
+        return {
+            name: "Good",
+            className: "good",
+            color: "#32965f",
+            description: "Air quality is satisfactory for outdoor activities."
+        };
+    }
+
+    if (aqi <= 100) {
+        return {
+            name: "Moderate",
+            className: "moderate",
+            color: "#dfb12f",
+            description: "Air quality is acceptable for most people."
+        };
+    }
+
+    if (aqi <= 150) {
+        return {
+            name: "Unhealthy for Sensitive Groups",
+            className: "sensitive",
+            color: "#e98b45",
+            description: "Sensitive people may experience health effects."
+        };
+    }
+
+    if (aqi <= 200) {
+        return {
+            name: "Unhealthy",
+            className: "unhealthy",
+            color: "#d94f4f",
+            description: "Some people may experience health effects."
+        };
+    }
+
+    if (aqi <= 300) {
+        return {
+            name: "Very Unhealthy",
+            className: "very-unhealthy",
+            color: "#9063bd",
+            description: "Health alert: reduce exposure to polluted air."
+        };
+    }
+
+    return {
+        name: "Hazardous",
+        className: "hazardous",
+        color: "#873b52",
+        description: "Health warning: follow official local guidance."
+    };
+}
+
+// Health advice based on the sample AQI
+function getRecommendations(aqi) {
+    if (aqi <= 50) {
+        return {
+            title: "Good time for outdoor activities",
+            lead: "Air quality is generally satisfactory.",
+            tips: [
+                "Continue normal outdoor activities.",
+                "Keep checking official local AQI updates.",
+                "Use public transport or walk when practical."
+            ]
+        };
+    }
+
+    if (aqi <= 100) {
+        return {
+            title: "A few precautions",
+            lead: "Sensitive people should monitor how they feel.",
+            tips: [
+                "People with asthma should monitor symptoms.",
+                "Take breaks during strenuous outdoor exercise.",
+                "Check official air-quality updates."
+            ]
+        };
+    }
+
+    if (aqi <= 150) {
+        return {
+            title: "Protect sensitive groups",
+            lead: "Some people may be more affected by pollution.",
+            tips: [
+                "Children, older adults and sensitive people should reduce prolonged outdoor exertion.",
+                "Choose lower-traffic routes where possible.",
+                "Follow local health and pollution-control advice."
+            ]
+        };
+    }
+
+    return {
+        title: "Limit exposure to polluted air",
+        lead: "Reduce time spent in polluted outdoor environments.",
+        tips: [
+            "Avoid strenuous outdoor activity when pollution is high.",
+            "Move exercise indoors if practical.",
+            "Follow official advisories and medical advice if needed."
+        ]
+    };
+}
+
+// Update the selected area's AQI cards and health advice
+function updateDashboard() {
+    const index = Number(
+        document.getElementById("areaSelect").value
+    );
+
+    const area = areas[index];
+    const category = getCategory(area.aqi);
+    const advice = getRecommendations(area.aqi);
+
+    document.getElementById("aqi").textContent = area.aqi;
+
+    const status = document.getElementById("status");
+    status.textContent = category.name;
+    status.className = "status " + category.className;
+
+    document.getElementById("aqiDescription").textContent =
+        category.description;
+
+    document.getElementById("pm25").textContent = area.pm25;
+    document.getElementById("pm10").textContent = area.pm10;
+    document.getElementById("areaName").textContent = area.name;
+    document.getElementById("areaNote").textContent = area.note;
+
+    document.getElementById("adviceTitle").textContent =
+        advice.title;
+
+    document.getElementById("adviceLead").textContent =
+        advice.lead;
+
+    const list = document.getElementById("adviceList");
+    list.innerHTML = "";
+
+    advice.tips.forEach(function(tip) {
+        const li = document.createElement("li");
+        li.textContent = tip;
+        list.appendChild(li);
+    });
+
+    updateChart();
+}
+
+// Draw a bar chart with CSS
+function updateChart() {
+    const pollutant =
+        document.getElementById("pollutantSelect").value;
+
+    const labels = {
+        pm25: "PM2.5",
+        pm10: "PM10",
+        no2: "NO₂",
+        o3: "O₃"
+    };
+
+    const isAQI = pollutant === "aqi";
+
+    document.getElementById("chartSubtitle").textContent =
+        isAQI
+        ? "Sample AQI comparison between city areas."
+        : "Sample " + labels[pollutant] +
+          " readings (µg/m³) between city areas.";
+
+    const values = areas.map(function(area) {
+        return isAQI ? area.aqi : area[pollutant];
+    });
+
+    const maxValue = isAQI
+        ? 200
+        : Math.max(...values, 1);
+
+    const chart = document.getElementById("chart");
+    chart.innerHTML = "";
+
+    areas.forEach(function(area) {
+        const value = isAQI ? area.aqi : area[pollutant];
+        const category = getCategory(area.aqi);
+
+        const row = document.createElement("div");
+        row.className = "chart-row";
+
+        const label = document.createElement("span");
+        label.textContent = area.name;
+
+        const track = document.createElement("div");
+        track.className = "bar-bg";
+
+        const bar = document.createElement("div");
+        bar.className = "bar";
+        bar.style.width =
+            Math.min(value / maxValue * 100, 100) + "%";
+        bar.style.background = isAQI
+            ? category.color
+            : "#32965f";
+
+        track.appendChild(bar);
+
+        const number = document.createElement("strong");
+        number.textContent = value;
+
+        row.append(label, track, number);
+        chart.appendChild(row);
+    });
+}
+
+// Populate the area summary table
+function createTable() {
+    const table = document.getElementById("areaTable");
+    table.innerHTML = "";
+
+    areas.forEach(function(area, index) {
+        const category = getCategory(area.aqi);
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${area.name}</td>
+            <td>${area.aqi}</td>
+            <td>
+                <span class="status ${category.className}">
+                    ${category.name}
+                </span>
+            </td>
+            <td>${area.note}</td>
+        `;
+
+        row.style.cursor = "pointer";
+
+        row.addEventListener("click", function() {
+            document.getElementById("areaSelect").value = index;
+            updateDashboard();
+            window.scrollTo({top: 0, behavior: "smooth"});
+        });
+
+        table.appendChild(row);
+    });
+}
+
+// Listen for user selections
+document.getElementById("areaSelect")
+    .addEventListener("change", updateDashboard);
+
+document.getElementById("pollutantSelect")
+    .addEventListener("change", updateChart);
+
+// Start the dashboard
+createTable();
+updateDashboard();
+</script>
+
+</body>
+</html>
